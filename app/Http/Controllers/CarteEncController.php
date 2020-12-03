@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class CarteEncController extends Controller
 {
@@ -13,8 +14,9 @@ class CarteEncController extends Controller
      */
     public function index()
     {
-        //
-        $cartesEtudiant = \App\Models\CarteEtudiant::all();
+        //$cartesEtudiant = \App\Models\CarteEtudiant::all();
+        $cartesEtudiant = Auth::user()->recupererCarte;
+
         return view('index', compact('cartesEtudiant'));
     }
 
@@ -50,9 +52,13 @@ class CarteEncController extends Controller
         $date = date_create($request->get('dateEntreeENC'));
         $format = date_format($date,"Y-m-d");
         $carteEtudiant->dateEntreeENC=strtotime($format);
-        $carteEtudiant->save();
+        //$carteEtudiant->save();
+
+
 
         return redirect('demandeCarte')->with('succes', 'Une nouvelle demande a été enregistrée');
+
+
     }
 
     /**
