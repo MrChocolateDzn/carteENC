@@ -42,7 +42,15 @@ class CarteEncController extends Controller
         //
         $request-> validate(['Fichier'=>'required|file|max:8192']);
         $nomFichier = time().\request()->Fichier->getClientOriginalName();
+
         $request->Fichier->storeAs('fichiers',$nomFichier);
+
+        //Contraiente d'integriter pour pas avoir de doublon
+        if(\App\Models\CarteEtudiant::where('email','=',$request->get('email'))->exists()){
+            return redirect('demandeCarte/create')->with('error','Attention l\'adresse mail existe déjà');
+        }
+        //dd($request);
+
         $carteEtudiant = new \App\Models\CarteEtudiant;
         $carteEtudiant->nomEtudiant = $request->get('nomEtudiantFormulaire');
         $carteEtudiant->email = $request->get('email');
@@ -52,9 +60,10 @@ class CarteEncController extends Controller
         $date = date_create($request->get('dateEntreeENC'));
         $format = date_format($date,"Y-m-d");
         $carteEtudiant->dateEntreeENC=strtotime($format);
-        //$carteEtudiant->save();
+        // $carteEtudiant->save();
 
 
+        Auth::user()->recupererCarte()->save($carteEtudiant) ;
 
         return redirect('demandeCarte')->with('succes', 'Une nouvelle demande a été enregistrée');
 
